@@ -9,7 +9,9 @@
     "lint": "eslint src/**/*.js",
     "lint:fix": "eslint src/**/*.js --fix",
     "test": "echo 'No tests specified - skipping'",
-    "build": "echo 'Build completed - Node.js project'"
+    "build": "echo 'Build completed - Node.js project'",
+    "db:migrate": "node src/database/migrate.js",
+    "db:seed": "node src/database/seed.js"
   },
   "keywords": [],
   "author": "",

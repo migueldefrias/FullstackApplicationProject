@@ -202,4 +202,4 @@ B4YOU/
 - Middleware de autenticação para rotas protegidas
 - Headers de CORS configurados
 - Interceptors para tratamento automático de tokens expirados
----
+

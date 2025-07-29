@@ -13,6 +13,15 @@ const productRoutes = require('./routes/products');
 app.use('/auth', authRoutes);
 app.use('/products', productRoutes);
 
+// Health check route for Railway
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    message: 'B4You API is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Rotas serão adicionadas aqui
 
 const PORT = process.env.PORT || 3001;
