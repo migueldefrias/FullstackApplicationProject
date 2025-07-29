@@ -49,7 +49,8 @@ export default function EditProductPage() {
           stock: product.stock.toString()
         });
       } catch (err: unknown) {
-        setError(((err as any)?.response)?.data?.message || 'Erro ao carregar produto');
+        const error = err as { response?: { data?: { message?: string } } };
+        setError(error.response?.data?.message || 'Erro ao carregar produto');
       } finally {
         setFetchLoading(false);
       }
@@ -82,7 +83,8 @@ export default function EditProductPage() {
       
       router.push('/products');
     } catch (err: unknown) {
-      setError(((err as any)?.response)?.data?.message || 'Erro ao atualizar produto');
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Erro ao atualizar produto');
     } finally {
       setLoading(false);
     }

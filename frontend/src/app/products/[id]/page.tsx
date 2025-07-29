@@ -38,7 +38,8 @@ export default function ProductDetailPage() {
         });
         setProduct(response.data);
       } catch (err: unknown) {
-        setError(((err as any)?.response)?.data?.message || 'Erro ao carregar produto');
+        const error = err as { response?: { data?: { message?: string } } };
+        setError(error.response?.data?.message || 'Erro ao carregar produto');
       } finally {
         setLoading(false);
       }
@@ -56,7 +57,8 @@ export default function ProductDetailPage() {
       });
       router.push('/products');
     } catch (err: unknown) {
-      setError(((err as any)?.response)?.data?.message || 'Erro ao excluir produto');
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Erro ao excluir produto');
     }
   };
 
