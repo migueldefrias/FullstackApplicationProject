@@ -1,0 +1,46 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+    
+    - name: Deploy notification
+      run: |
+        echo "🚀 Ready for deployment!"
+        echo "Backend built successfully"
+        echo "Frontend built successfully"
+        echo "Docker images ready"
+    
+    # Aqui você pode adicionar steps reais de deploy quando necessário
+    # Por exemplo:
+    # - Deploy para Heroku
+    # - Deploy para AWS
+    # - Deploy para Vercel (frontend)
+    # - Deploy para Railway/Render (backend)
+    
+    - name: Deployment placeholder
+      run: |
+        echo "Add your deployment steps here"
+        echo "Examples:"
+        echo "- Deploy frontend to Vercel"
+        echo "- Deploy backend to Railway/Render"
+        echo "- Deploy to Docker registry"

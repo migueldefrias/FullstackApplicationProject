@@ -2,6 +2,8 @@
 
 Sistema de gerenciamento de produtos desenvolvido como teste técnico para a B4You, implementando um CRUD completo com autenticação JWT.
 
+[![CI/CD Pipeline](https://github.com/migueldefrias/FullstackApplicationProject/actions/workflows/ci.yml/badge.svg)](https://github.com/migueldefrias/FullstackApplicationProject/actions/workflows/ci.yml)
+
 ## Tecnologias Utilizadas
 
 ### Backend
@@ -10,6 +12,7 @@ Sistema de gerenciamento de produtos desenvolvido como teste técnico para a B4Y
 - **Sequelize** como ORM
 - **JWT** para autenticação
 - **Yup** para validação
+- **ESLint** para linting
 - **Docker & Docker Compose** para containerização
 
 ### Frontend
@@ -17,6 +20,13 @@ Sistema de gerenciamento de produtos desenvolvido como teste técnico para a B4Y
 - **TypeScript**
 - **Tailwind CSS** para estilização
 - **Axios** para requisições HTTP
+- **ESLint** para linting
+
+### CI/CD
+- **GitHub Actions** para automação
+- **Lint automático** no backend e frontend
+- **Build automático** em múltiplas versões do Node.js
+- **Testes de Docker** para verificar containerização
 
 ## 📋 Funcionalidades
 
