@@ -23,9 +23,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Verificar se há token no localStorage ao carregar a aplicação
-    const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      setToken(storedToken);
+    if (typeof window !== 'undefined') {
+      const storedToken = localStorage.getItem('token');
+      if (storedToken) {
+        setToken(storedToken);
+      }
     }
     setInitializing(false);
   }, []);
@@ -39,7 +41,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { token: newToken } = response.data;
       
       setToken(newToken);
-      localStorage.setItem('token', newToken);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('token', newToken);
+      }
       return true;
     } catch (err: unknown) {
       const errorMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao fazer login';
@@ -52,7 +56,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setToken(null);
-    localStorage.removeItem('token');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+    }
     setError(null);
   };
 
