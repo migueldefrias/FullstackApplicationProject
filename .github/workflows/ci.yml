@@ -81,10 +81,6 @@ jobs:
     
     - name: Build application
       run: npm run build
-    
-    - name: Export static files
-      run: npm run export
-      continue-on-error: true
 
   docker:
     name: Docker Build Test
@@ -101,6 +97,10 @@ jobs:
     - name: Build backend Docker image
       run: |
         docker build -t backend:test ./backend
+    
+    - name: Create env file for docker-compose test
+      run: |
+        cp backend/.env.example backend/.env
     
     - name: Test docker compose configuration
       run: |
