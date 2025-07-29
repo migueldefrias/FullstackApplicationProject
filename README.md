@@ -28,7 +28,7 @@ Sistema de gerenciamento de produtos desenvolvido como teste técnico para a B4Y
 - **Build automático** em múltiplas versões do Node.js
 - **Testes de Docker** para verificar containerização
 
-## 📋 Funcionalidades
+## Funcionalidades
 
 - Autenticação com JWT
 - CRUD completo de produtos
