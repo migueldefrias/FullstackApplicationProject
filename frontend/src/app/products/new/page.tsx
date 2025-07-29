@@ -45,8 +45,8 @@ export default function NewProductPage() {
       });
       
       router.push('/products');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao criar produto');
+    } catch (err: unknown) {
+      setError(((err as any)?.response)?.data?.message || 'Erro ao criar produto');
     } finally {
       setLoading(false);
     }

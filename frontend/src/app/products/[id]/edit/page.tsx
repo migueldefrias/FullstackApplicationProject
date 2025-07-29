@@ -48,8 +48,8 @@ export default function EditProductPage() {
           price: product.price,
           stock: product.stock.toString()
         });
-      } catch (err: any) {
-        setError(err.response?.data?.message || 'Erro ao carregar produto');
+      } catch (err: unknown) {
+        setError(((err as any)?.response)?.data?.message || 'Erro ao carregar produto');
       } finally {
         setFetchLoading(false);
       }
@@ -81,8 +81,8 @@ export default function EditProductPage() {
       });
       
       router.push('/products');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao atualizar produto');
+    } catch (err: unknown) {
+      setError(((err as any)?.response)?.data?.message || 'Erro ao atualizar produto');
     } finally {
       setLoading(false);
     }

@@ -32,8 +32,9 @@ export default function ProductsPage() {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProducts(res.data);
-      } catch (err: any) {
-        setError(err.response?.data?.message || "Erro ao carregar produtos");
+      } catch (err: unknown) {
+        const error = err as { response?: { data?: { message?: string } } };
+        setError(error.response?.data?.message || "Erro ao carregar produtos");
       } finally {
         setLoading(false);
       }
@@ -143,8 +144,9 @@ export default function ProductsPage() {
                               headers: { Authorization: `Bearer ${token}` },
                             });
                             setProducts(products.filter((p) => p.id !== product.id));
-                          } catch (err: any) {
-                            setError(err.response?.data?.message || "Erro ao excluir produto");
+                          } catch (err: unknown) {
+                            const error = err as { response?: { data?: { message?: string } } };
+                            setError(error.response?.data?.message || "Erro ao excluir produto");
                           }
                         }
                       }}

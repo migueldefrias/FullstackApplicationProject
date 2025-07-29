@@ -37,8 +37,8 @@ export default function ProductDetailPage() {
           headers: { Authorization: `Bearer ${token}` }
         });
         setProduct(response.data);
-      } catch (err: any) {
-        setError(err.response?.data?.message || 'Erro ao carregar produto');
+      } catch (err: unknown) {
+        setError(((err as any)?.response)?.data?.message || 'Erro ao carregar produto');
       } finally {
         setLoading(false);
       }
@@ -55,8 +55,8 @@ export default function ProductDetailPage() {
         headers: { Authorization: `Bearer ${token}` }
       });
       router.push('/products');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao excluir produto');
+    } catch (err: unknown) {
+      setError(((err as any)?.response)?.data?.message || 'Erro ao excluir produto');
     }
   };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import api from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -21,13 +21,21 @@ export interface ProductFormData {
   stock: number;
 }
 
+interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+}
+
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     if (!isAuthenticated) return;
     
     setLoading(true);
@@ -35,19 +43,21 @@ export function useProducts() {
     try {
       const response = await api.get('/products');
       setProducts(response.data);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao carregar produtos');
+    } catch (err: unknown) {
+      const apiError = err as ApiError;
+      setError(apiError.response?.data?.message || 'Erro ao carregar produtos');
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAuthenticated]);
 
   const fetchProduct = async (id: string): Promise<Product | null> => {
     try {
       const response = await api.get(`/products/${id}`);
       return response.data;
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao carregar produto');
+    } catch (err: unknown) {
+      const apiError = err as ApiError;
+      setError(apiError.response?.data?.message || 'Erro ao carregar produto');
       return null;
     }
   };
@@ -58,8 +68,9 @@ export function useProducts() {
       const newProduct = response.data;
       setProducts(prev => [...prev, newProduct]);
       return newProduct;
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao criar produto');
+    } catch (err: unknown) {
+      const apiError = err as ApiError;
+      setError(apiError.response?.data?.message || 'Erro ao criar produto');
       return null;
     }
   };
@@ -70,8 +81,9 @@ export function useProducts() {
       const updatedProduct = response.data;
       setProducts(prev => prev.map(p => p.id === Number(id) ? updatedProduct : p));
       return updatedProduct;
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao atualizar produto');
+    } catch (err: unknown) {
+      const apiError = err as ApiError;
+      setError(apiError.response?.data?.message || 'Erro ao atualizar produto');
       return null;
     }
   };
@@ -81,8 +93,9 @@ export function useProducts() {
       await api.delete(`/products/${id}`);
       setProducts(prev => prev.filter(p => p.id !== id));
       return true;
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao excluir produto');
+    } catch (err: unknown) {
+      const apiError = err as ApiError;
+      setError(apiError.response?.data?.message || 'Erro ao excluir produto');
       return false;
     }
   };
@@ -91,7 +104,7 @@ export function useProducts() {
 
   useEffect(() => {
     fetchProducts();
-  }, [isAuthenticated]);
+  }, [fetchProducts]);
 
   return {
     products,

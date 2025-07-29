@@ -41,8 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(newToken);
       localStorage.setItem('token', newToken);
       return true;
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Erro ao fazer login';
+    } catch (err: unknown) {
+      const errorMessage = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Erro ao fazer login';
       setError(errorMessage);
       return false;
     } finally {
