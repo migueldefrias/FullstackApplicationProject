@@ -1,0 +1,32 @@
+{
+  "name": "b4you-backend",
+  "version": "1.0.0",
+  "description": "Backend API for B4You product management system",
+  "main": "backend/src/server.js",
+  "scripts": {
+    "dev": "nodemon backend/src/server.js",
+    "start": "node backend/src/server.js",
+    "lint": "eslint backend/src/**/*.js",
+    "lint:fix": "eslint backend/src/**/*.js --fix",
+    "test": "echo 'No tests specified - skipping'",
+    "build": "echo 'Build completed - Node.js project'",
+    "db:migrate": "node backend/src/database/migrate.js",
+    "db:seed": "node backend/src/database/seed.js"
+  },
+  "keywords": ["backend", "api", "nodejs", "express", "mysql"],
+  "author": "Miguel de Frias",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.2",
+    "sequelize": "^6.37.7",
+    "yup": "^1.6.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "nodemon": "^3.1.10"
+  }
+}
