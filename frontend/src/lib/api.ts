@@ -1,10 +1,16 @@
 import axios from 'axios';
 
-// Configuração base da API
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+// Configuração base da API com validação de protocolo
+const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+// Garantir que sempre use https:// em produção
+export const API_BASE_URL = rawApiUrl.startsWith('http://') || rawApiUrl.startsWith('https://') 
+  ? rawApiUrl 
+  : `https://${rawApiUrl}`;
 
 // Log para debug - será removido depois
-console.log('🔧 API_BASE_URL:', API_BASE_URL);
+console.log('🔧 Raw API URL:', rawApiUrl);
+console.log('🔧 Final API_BASE_URL:', API_BASE_URL);
 console.log('🔧 Environment:', process.env.NODE_ENV);
 
 // Instância do axios configurada
