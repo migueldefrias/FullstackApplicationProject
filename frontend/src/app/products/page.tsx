@@ -2,7 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../contexts/AuthContext";
-import axios from "axios";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import { api } from "../../lib/api";
 
 interface Product {
   id: number;
@@ -28,9 +29,7 @@ export default function ProductsPage() {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get("http://localhost:3001/products", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await api.get("/products");
         setProducts(res.data);
       } catch (err: unknown) {
         const error = err as { response?: { data?: { message?: string } } };
@@ -140,9 +139,7 @@ export default function ProductsPage() {
                       onClick={async () => {
                         if (confirm(`Tem certeza que deseja excluir "${product.name}"?`)) {
                           try {
-                            await axios.delete(`http://localhost:3001/products/${product.id}`, {
-                              headers: { Authorization: `Bearer ${token}` },
-                            });
+                            await api.delete(`/products/${product.id}`);
                             setProducts(products.filter((p) => p.id !== product.id));
                           } catch (err: unknown) {
                             const error = err as { response?: { data?: { message?: string } } };

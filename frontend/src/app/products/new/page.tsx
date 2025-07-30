@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '../../../contexts/AuthContext';
-import axios from 'axios';
+import { useAuth } from "../../../contexts/AuthContext";
+import { api } from "../../../lib/api";
 
 export default function NewProductPage() {
   const { token, isAuthenticated } = useAuth();
@@ -36,12 +36,10 @@ export default function NewProductPage() {
     setError(null);
 
     try {
-      await axios.post('http://localhost:3001/products', {
+      await api.post('/products', {
         ...formData,
         price: Number(formData.price),
         stock: Number(formData.stock)
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       
       router.push('/products');
