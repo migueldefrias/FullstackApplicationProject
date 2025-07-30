@@ -49,16 +49,19 @@ app.get('/config', (req, res) => {
   });
 });
 
-// Login sem JWT por enquanto
+// Login com token temporário
 app.post('/auth/login', (req, res) => {
-  console.log('� Login attempt:', req.body);
+  console.log('🔐 Login attempt:', req.body);
   const { email, password } = req.body;
   
   if (email === 'admin@b4you.dev' && password === '123456') {
     console.log('✅ Login ok');
+    // Retorna um token temporário para compatibilidade
+    const temporaryToken = 'temp_token_' + Date.now();
     return res.json({ 
-      message: 'Login successful',
-      user: { email }
+      token: temporaryToken,
+      user: { email },
+      message: 'Login successful'
     });
   }
   
@@ -75,4 +78,4 @@ console.log(`🔧 Configurando servidor - HOST: ${HOST}, PORT: ${PORT}`);
 app.listen(PORT, HOST, () => {
   console.log(`🚀 Servidor RAILWAY rodando em ${HOST}:${PORT}`);
   console.log(`📍 Environment PORT: ${process.env.PORT || 'não definida'}`);
-}); 
+});
