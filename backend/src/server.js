@@ -1,33 +1,55 @@
 require('dotenv').config();
 const express = require('express');
-const sequelize = require('./database');
-const Product = require('./models/Product');
 
 const app = express();
 
 console.log('🚀 Starting server...');
 
-// Conectar ao banco de dados
-sequelize.authenticate()
-  .then(() => {
-    console.log('🗄️ Database connected successfully');
-    return sequelize.sync();
-  })
-  .then(() => {
-    console.log('📊 Database synced');
-  })
-  .catch(err => {
-    console.error('❌ Database connection failed:', err);
-  });
+// Inicializar banco de dados apenas se as variáveis estiverem configuradas
+let sequelize, Product;
+const hasDbConfig = process.env.DB_HOST && process.env.DB_NAME && process.env.DB_USER;
+
+if (hasDbConfig) {
+  console.log('�️ Database config found, initializing...');
+  sequelize = require('./database');
+  Product = require('./models/Product');
+  
+  // Conectar ao banco de dados
+  sequelize.authenticate()
+    .then(() => {
+      console.log('🗄️ Database connected successfully');
+      return sequelize.sync();
+    })
+    .then(() => {
+      console.log('📊 Database synced');
+    })
+    .catch(err => {
+      console.error('❌ Database connection failed:', err);
+    });
+} else {
+  console.log('⚠️ Database config not found, using mock data');
+}
 
 // Middleware básico
 app.use(express.json());
 
-// CORS básico
+// CORS melhorado
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  const allowedOrigins = [
+    'http://localhost:3000',
+    'https://fullstack-application-project.vercel.app',
+    'https://fullstackapplicationproject-production.up.railway.app'
+  ];
+  
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
   if (req.method === 'OPTIONS') {
     res.sendStatus(200);
   } else {
@@ -44,12 +66,21 @@ app.use((req, res, next) => {
 // Rotas super simples
 app.get('/', (req, res) => {
   console.log('📍 Root route accessed');
-  res.json({ message: 'B4You API - Ultra Simple' });
+  res.json({ 
+    message: 'B4You API',
+    status: 'running',
+    database: hasDbConfig ? 'configured' : 'mock',
+    timestamp: new Date().toISOString()
+  });
 });
 
 app.get('/health', (req, res) => {
   console.log('🩺 Health check');
-  res.json({ status: 'OK' });
+  res.json({ 
+    status: 'OK',
+    database: hasDbConfig ? 'configured' : 'mock',
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
 // Endpoint para debug das configurações
@@ -86,52 +117,195 @@ app.post('/auth/login', (req, res) => {
   return res.status(401).json({ message: 'Invalid credentials' });
 });
 
-// Rota de produtos - conectada ao banco
+// Rota de produtos - com fallback para mock
 app.get('/products', async (req, res) => {
   try {
-    console.log('📦 Products list requested from database');
-    const products = await Product.findAll({
-      order: [['createdAt', 'DESC']]
-    });
-    console.log(`📦 Found ${products.length} products`);
-    res.json(products);
+    console.log('📦 Products list requested');
+    
+    if (hasDbConfig && Product) {
+      console.log('📦 Fetching from database...');
+      const products = await Product.findAll({
+        order: [['createdAt', 'DESC']]
+      });
+      console.log(`📦 Found ${products.length} products from database`);
+      res.json(products);
+    } else {
+      console.log('📦 Using mock data...');
+      const mockProducts = [
+        {
+          id: 1,
+          name: 'Produto Mock 1',
+          description: 'Produto de exemplo enquanto banco não está configurado',
+          price: 99.99,
+          stock: 10,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 2,
+          name: 'Produto Mock 2',
+          description: 'Outro produto de exemplo',
+          price: 149.99,
+          stock: 5,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ];
+      res.json(mockProducts);
+    }
   } catch (error) {
     console.error('❌ Error fetching products:', error);
     res.status(500).json({ message: 'Erro ao buscar produtos', error: error.message });
   }
 });
 
-// Rota para criar novo produto - conectada ao banco
+// Rota para criar produto - com fallback para mock
 app.post('/products', async (req, res) => {
   try {
-    console.log('📦 Create product request:', req.body);
-    const { name, description, price, category, stock } = req.body;
+    console.log('📦 Creating product:', req.body);
+    const { name, description, price, stock } = req.body;
     
-    // Validação básica
-    if (!name || !description || !price) {
-      return res.status(400).json({ 
-        message: 'Campos obrigatórios: name, description, price' 
+    if (hasDbConfig && Product) {
+      console.log('📦 Creating in database...');
+      const product = await Product.create({
+        name,
+        description,
+        price: parseFloat(price),
+        stock: parseInt(stock)
       });
+      console.log('📦 Product created with ID:', product.id);
+      res.status(201).json(product);
+    } else {
+      console.log('📦 Simulating product creation...');
+      const mockProduct = {
+        id: Date.now(),
+        name,
+        description,
+        price: parseFloat(price),
+        stock: parseInt(stock),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      console.log('📦 Mock product created:', mockProduct.id);
+      res.status(201).json(mockProduct);
     }
-    
-    // Criar produto no banco
-    const newProduct = await Product.create({
-      name,
-      description,
-      price: Number(price),
-      stock: Number(stock) || 0
-    });
-    
-    console.log('✅ Product created in database:', newProduct.toJSON());
-    res.status(201).json(newProduct);
-    
   } catch (error) {
     console.error('❌ Error creating product:', error);
-    res.status(500).json({ 
-      message: 'Erro ao criar produto', 
-      error: error.message 
-    });
+    res.status(500).json({ message: 'Erro ao criar produto', error: error.message });
   }
+});
+
+// Rota para obter um produto específico
+app.get('/products/:id', async (req, res) => {
+  try {
+    console.log('📦 Product detail requested for ID:', req.params.id);
+    
+    if (hasDbConfig && Product) {
+      console.log('📦 Fetching from database...');
+      const product = await Product.findByPk(req.params.id);
+      if (!product) {
+        return res.status(404).json({ message: 'Produto não encontrado' });
+      }
+      console.log('📦 Product found:', product.name);
+      res.json(product);
+    } else {
+      console.log('📦 Using mock data...');
+      const mockProduct = {
+        id: parseInt(req.params.id),
+        name: `Produto Mock ${req.params.id}`,
+        description: 'Produto de exemplo enquanto banco não está configurado',
+        price: 99.99,
+        stock: 10,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      res.json(mockProduct);
+    }
+  } catch (error) {
+    console.error('❌ Error fetching product:', error);
+    res.status(500).json({ message: 'Erro ao buscar produto', error: error.message });
+  }
+});
+
+// Rota para atualizar produto
+app.put('/products/:id', async (req, res) => {
+  try {
+    console.log('📦 Updating product ID:', req.params.id, 'with data:', req.body);
+    const { name, description, price, stock } = req.body;
+    
+    if (hasDbConfig && Product) {
+      console.log('📦 Updating in database...');
+      const product = await Product.findByPk(req.params.id);
+      if (!product) {
+        return res.status(404).json({ message: 'Produto não encontrado' });
+      }
+      
+      await product.update({
+        name,
+        description,
+        price: parseFloat(price),
+        stock: parseInt(stock)
+      });
+      
+      console.log('📦 Product updated:', product.name);
+      res.json(product);
+    } else {
+      console.log('📦 Simulating product update...');
+      const mockProduct = {
+        id: parseInt(req.params.id),
+        name,
+        description,
+        price: parseFloat(price),
+        stock: parseInt(stock),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      console.log('📦 Mock product updated:', mockProduct.id);
+      res.json(mockProduct);
+    }
+  } catch (error) {
+    console.error('❌ Error updating product:', error);
+    res.status(500).json({ message: 'Erro ao atualizar produto', error: error.message });
+  }
+});
+
+// Rota para deletar produto
+app.delete('/products/:id', async (req, res) => {
+  try {
+    console.log('📦 Deleting product ID:', req.params.id);
+    
+    if (hasDbConfig && Product) {
+      console.log('📦 Deleting from database...');
+      const product = await Product.findByPk(req.params.id);
+      if (!product) {
+        return res.status(404).json({ message: 'Produto não encontrado' });
+      }
+      
+      await product.destroy();
+      console.log('📦 Product deleted from database');
+      res.json({ message: 'Produto deletado com sucesso' });
+    } else {
+      console.log('📦 Simulating product deletion...');
+      res.json({ message: 'Produto deletado com sucesso (simulado)' });
+    }
+  } catch (error) {
+    console.error('❌ Error deleting product:', error);
+    res.status(500).json({ message: 'Erro ao deletar produto', error: error.message });
+  }
+});
+
+// Middleware de tratamento de erros
+app.use((err, req, res, next) => {
+  console.error('❌ Server error:', err);
+  res.status(500).json({ 
+    message: 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ message: 'Route not found' });
 });
 
 // Configuração da porta - Railway injeta automaticamente
