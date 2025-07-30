@@ -25,6 +25,15 @@ const productRoutes = require('./routes/products');
 app.use('/auth', authRoutes);
 app.use('/products', productRoutes);
 
+// Root route
+app.get('/', (req, res) => {
+  res.status(200).json({ 
+    message: 'B4You API is running',
+    timestamp: new Date().toISOString(),
+    routes: ['/health', '/auth/login', '/products']
+  });
+});
+
 // Health check route for Railway
 app.get('/health', (req, res) => {
   res.status(200).json({ 
