@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 
@@ -38,7 +39,6 @@ app.post('/auth/login', (req, res) => {
   const { email, password } = req.body;
   
   if (email === 'admin@b4you.dev' && password === '123456') {
-    const jwt = require('jsonwebtoken');
     const token = jwt.sign(
       { email },
       process.env.JWT_SECRET || 'temporary-secret',
