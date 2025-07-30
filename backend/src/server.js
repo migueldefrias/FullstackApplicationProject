@@ -7,59 +7,54 @@ const app = express();
 // Middleware de logging para debug
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  console.log('Headers:', JSON.stringify(req.headers, null, 2));
   next();
 });
 
-// CORS configurado para permitir frontend
-const corsOptions = {
-  origin: true, // Permitir todas as origens temporariamente para debug
+// CORS mais simples
+app.use(cors({
+  origin: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-};
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
-app.use(cors(corsOptions));
 app.use(express.json());
 
-// Middleware específico para OPTIONS (preflight)
-app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-  res.sendStatus(200);
-});
-
-const authRoutes = require('./routes/auth');
-// const productRoutes = require('./routes/products'); // Temporariamente comentado
-
-app.use('/auth', authRoutes);
-// app.use('/products', productRoutes); // Temporariamente comentado
-
-// Root route
+// Rotas básicas apenas
 app.get('/', (req, res) => {
-  res.status(200).json({ 
-    message: 'B4You API is running',
+  res.json({ 
+    message: 'B4You API - Versão Simplificada',
     timestamp: new Date().toISOString(),
-    routes: ['/health', '/auth/login']
+    status: 'OK'
   });
 });
 
-// Health check route for Railway
 app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
-    message: 'B4You API is running',
-    timestamp: new Date().toISOString()
-  });
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Rotas serão adicionadas aqui
+// Rota de login diretamente no server (temporário)
+app.post('/auth/login', (req, res) => {
+  console.log('📧 Login attempt:', req.body);
+  const { email, password } = req.body;
+  
+  if (email === 'admin@b4you.dev' && password === '123456') {
+    const jwt = require('jsonwebtoken');
+    const token = jwt.sign(
+      { email },
+      process.env.JWT_SECRET || 'temporary-secret',
+      { expiresIn: '1h' }
+    );
+    console.log('✅ Login successful');
+    return res.json({ token, user: { email } });
+  }
+  
+  console.log('❌ Login failed');
+  return res.status(401).json({ message: 'Credenciais inválidas.' });
+});
 
 const PORT = process.env.PORT || 3001;
 const HOST = process.env.HOST || '0.0.0.0';
 
 app.listen(PORT, HOST, () => {
-  console.log(`🚀 Servidor rodando em ${HOST}:${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🚀 Servidor SIMPLIFICADO rodando em ${HOST}:${PORT}`);
 }); 
