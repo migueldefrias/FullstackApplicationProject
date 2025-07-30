@@ -1,7 +1,24 @@
+require('dotenv').config();
 const express = require('express');
+const sequelize = require('./database');
+const Product = require('./models/Product');
+
 const app = express();
 
 console.log('🚀 Starting server...');
+
+// Conectar ao banco de dados
+sequelize.authenticate()
+  .then(() => {
+    console.log('🗄️ Database connected successfully');
+    return sequelize.sync();
+  })
+  .then(() => {
+    console.log('📊 Database synced');
+  })
+  .catch(err => {
+    console.error('❌ Database connection failed:', err);
+  });
 
 // Middleware básico
 app.use(express.json());
@@ -69,57 +86,52 @@ app.post('/auth/login', (req, res) => {
   return res.status(401).json({ message: 'Invalid credentials' });
 });
 
-// Rota de produtos temporária
-app.get('/products', (req, res) => {
-  console.log('📦 Products list requested');
-  // Produtos mock para teste
-  const products = [
-    {
-      id: 1,
-      name: 'Produto Teste 1',
-      description: 'Descrição do produto 1',
-      price: 99.99,
-      category: 'Categoria A',
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: 2,
-      name: 'Produto Teste 2', 
-      description: 'Descrição do produto 2',
-      price: 149.99,
-      category: 'Categoria B',
-      createdAt: new Date().toISOString()
-    }
-  ];
-  
-  res.json(products);
+// Rota de produtos - conectada ao banco
+app.get('/products', async (req, res) => {
+  try {
+    console.log('📦 Products list requested from database');
+    const products = await Product.findAll({
+      order: [['createdAt', 'DESC']]
+    });
+    console.log(`📦 Found ${products.length} products`);
+    res.json(products);
+  } catch (error) {
+    console.error('❌ Error fetching products:', error);
+    res.status(500).json({ message: 'Erro ao buscar produtos', error: error.message });
+  }
 });
 
-// Rota para criar novo produto
-app.post('/products', (req, res) => {
-  console.log('📦 Create product request:', req.body);
-  const { name, description, price, category, stock } = req.body;
-  
-  // Validação básica
-  if (!name || !description || !price || !category) {
-    return res.status(400).json({ 
-      message: 'Campos obrigatórios: name, description, price, category' 
+// Rota para criar novo produto - conectada ao banco
+app.post('/products', async (req, res) => {
+  try {
+    console.log('📦 Create product request:', req.body);
+    const { name, description, price, category, stock } = req.body;
+    
+    // Validação básica
+    if (!name || !description || !price) {
+      return res.status(400).json({ 
+        message: 'Campos obrigatórios: name, description, price' 
+      });
+    }
+    
+    // Criar produto no banco
+    const newProduct = await Product.create({
+      name,
+      description,
+      price: Number(price),
+      stock: Number(stock) || 0
+    });
+    
+    console.log('✅ Product created in database:', newProduct.toJSON());
+    res.status(201).json(newProduct);
+    
+  } catch (error) {
+    console.error('❌ Error creating product:', error);
+    res.status(500).json({ 
+      message: 'Erro ao criar produto', 
+      error: error.message 
     });
   }
-  
-  // Simular criação do produto
-  const newProduct = {
-    id: Date.now(), // ID temporário baseado no timestamp
-    name,
-    description,
-    price: Number(price),
-    category,
-    stock: Number(stock) || 0,
-    createdAt: new Date().toISOString()
-  };
-  
-  console.log('✅ Product created:', newProduct);
-  res.status(201).json(newProduct);
 });
 
 // Configuração da porta - Railway injeta automaticamente
