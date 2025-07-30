@@ -52,9 +52,13 @@ app.post('/auth/login', (req, res) => {
   return res.status(401).json({ message: 'Invalid credentials' });
 });
 
-const PORT = process.env.PORT || 8080;
-const HOST = process.env.HOST || '0.0.0.0';
+// Configuração da porta - Railway injeta automaticamente
+const PORT = process.env.PORT || 3000; // Seguindo o padrão do Railway
+const HOST = '0.0.0.0'; // Sempre bind em 0.0.0.0
+
+console.log(`🔧 Configurando servidor - HOST: ${HOST}, PORT: ${PORT}`);
 
 app.listen(PORT, HOST, () => {
-  console.log(`🚀 Servidor SIMPLIFICADO rodando em ${HOST}:${PORT}`);
+  console.log(`🚀 Servidor RAILWAY rodando em ${HOST}:${PORT}`);
+  console.log(`📍 Environment PORT: ${process.env.PORT || 'não definida'}`);
 }); 
