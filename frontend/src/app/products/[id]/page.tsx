@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useAuth } from '../../../contexts/AuthContext';
-import axios from 'axios';
+import { useAuth } from "../../../contexts/AuthContext";
+import LoadingSpinner from "../../../components/LoadingSpinner";
+import { api } from "../../../lib/api";
 
 interface Product {
   id: number;
@@ -33,9 +34,7 @@ export default function ProductDetailPage() {
 
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/products/${productId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await api.get(`/products/${productId}`);
         setProduct(response.data);
       } catch (err: unknown) {
         const error = err as { response?: { data?: { message?: string } } };
@@ -52,9 +51,7 @@ export default function ProductDetailPage() {
     if (!product || !confirm('Tem certeza que deseja excluir este produto?')) return;
 
     try {
-      await axios.delete(`http://localhost:3001/products/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/products/${productId}`);
       router.push('/products');
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };

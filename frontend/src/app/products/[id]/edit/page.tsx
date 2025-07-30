@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { useAuth } from '../../../../contexts/AuthContext';
-import axios from 'axios';
+import { useAuth } from "../../../../contexts/AuthContext";
+import LoadingSpinner from "../../../../components/LoadingSpinner";
+import { api } from "../../../../lib/api";
 
 interface Product {
   id: number;
@@ -37,9 +38,7 @@ export default function EditProductPage() {
 
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/products/${productId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const response = await api.get(`/products/${productId}`);
         
         const product: Product = response.data;
         setFormData({
@@ -73,12 +72,10 @@ export default function EditProductPage() {
     setError(null);
 
     try {
-      await axios.put(`http://localhost:3001/products/${productId}`, {
+      await api.put(`/products/${productId}`, {
         ...formData,
         price: Number(formData.price),
         stock: Number(formData.stock)
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       
       router.push('/products');
