@@ -5,14 +5,6 @@ const app = express();
 
 console.log('🚀 Starting B4You API...');
 
-// Debug das variáveis de ambiente
-console.log('🔍 Environment variables:');
-console.log('- MYSQLHOST:', process.env.MYSQLHOST);
-console.log('- MYSQLDATABASE:', process.env.MYSQLDATABASE);
-console.log('- MYSQLUSER:', process.env.MYSQLUSER);
-console.log('- MYSQLPASSWORD:', process.env.MYSQLPASSWORD ? '***hidden***' : 'NOT SET');
-console.log('- MYSQLPORT:', process.env.MYSQLPORT);
-
 // Middleware básico
 app.use(express.json());
 
