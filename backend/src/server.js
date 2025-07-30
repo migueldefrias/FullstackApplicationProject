@@ -35,6 +35,20 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK' });
 });
 
+// Endpoint para debug das configurações
+app.get('/config', (req, res) => {
+  console.log('⚙️ Config check');
+  res.json({
+    port: process.env.PORT || 'não definida',
+    railway: {
+      domain: process.env.RAILWAY_PUBLIC_DOMAIN || 'não definida',
+      service: process.env.RAILWAY_SERVICE_NAME || 'não definida',
+      environment: process.env.RAILWAY_ENVIRONMENT_NAME || 'não definida'
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Login sem JWT por enquanto
 app.post('/auth/login', (req, res) => {
   console.log('� Login attempt:', req.body);
