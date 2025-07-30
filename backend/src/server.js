@@ -22,6 +22,14 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// Middleware específico para OPTIONS (preflight)
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+  res.sendStatus(200);
+});
+
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 
@@ -49,6 +57,9 @@ app.get('/health', (req, res) => {
 // Rotas serão adicionadas aqui
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
+const HOST = process.env.HOST || '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
+  console.log(`🚀 Servidor rodando em ${HOST}:${PORT}`);
+  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 }); 
