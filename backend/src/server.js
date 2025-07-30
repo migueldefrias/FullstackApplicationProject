@@ -4,6 +4,13 @@ const cors = require('cors');
 
 const app = express();
 
+// Middleware de logging para debug
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  console.log('Headers:', JSON.stringify(req.headers, null, 2));
+  next();
+});
+
 // CORS configurado para permitir frontend
 const corsOptions = {
   origin: true, // Permitir todas as origens temporariamente para debug
