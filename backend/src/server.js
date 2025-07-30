@@ -31,17 +31,17 @@ app.options('*', (req, res) => {
 });
 
 const authRoutes = require('./routes/auth');
-const productRoutes = require('./routes/products');
+// const productRoutes = require('./routes/products'); // Temporariamente comentado
 
 app.use('/auth', authRoutes);
-app.use('/products', productRoutes);
+// app.use('/products', productRoutes); // Temporariamente comentado
 
 // Root route
 app.get('/', (req, res) => {
   res.status(200).json({ 
     message: 'B4You API is running',
     timestamp: new Date().toISOString(),
-    routes: ['/health', '/auth/login', '/products']
+    routes: ['/health', '/auth/login']
   });
 });
 
