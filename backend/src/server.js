@@ -5,6 +5,14 @@ const app = express();
 
 console.log('🚀 Starting B4You API...');
 
+// Debug das variáveis de ambiente
+console.log('🔍 Environment variables:');
+console.log('- MYSQLHOST:', process.env.MYSQLHOST);
+console.log('- MYSQLDATABASE:', process.env.MYSQLDATABASE);
+console.log('- MYSQLUSER:', process.env.MYSQLUSER);
+console.log('- MYSQLPASSWORD:', process.env.MYSQLPASSWORD ? '***hidden***' : 'NOT SET');
+console.log('- MYSQLPORT:', process.env.MYSQLPORT);
+
 // Middleware básico
 app.use(express.json());
 
@@ -21,7 +29,7 @@ app.use((req, res, next) => {
 });
 
 // Inicializar banco
-let sequelize, Product;
+let sequelize, Product, dbConnected = false;
 try {
   sequelize = require('./database');
   Product = require('./models/Product');
@@ -29,12 +37,17 @@ try {
   sequelize.authenticate()
     .then(() => {
       console.log('✅ Database connected');
+      dbConnected = true;
       return sequelize.sync();
     })
     .then(() => console.log('✅ Database synced'))
-    .catch(err => console.error('❌ DB Error:', err));
+    .catch(err => {
+      console.error('❌ DB Error:', err.message);
+      dbConnected = false;
+    });
 } catch (error) {
-  console.error('❌ Database init failed:', error);
+  console.error('❌ Database init failed:', error.message);
+  dbConnected = false;
 }
 
 // Rotas básicas
