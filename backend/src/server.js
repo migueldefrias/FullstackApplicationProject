@@ -69,6 +69,32 @@ app.post('/auth/login', (req, res) => {
   return res.status(401).json({ message: 'Invalid credentials' });
 });
 
+// Rota de produtos temporária
+app.get('/products', (req, res) => {
+  console.log('📦 Products list requested');
+  // Produtos mock para teste
+  const products = [
+    {
+      id: 1,
+      name: 'Produto Teste 1',
+      description: 'Descrição do produto 1',
+      price: 99.99,
+      category: 'Categoria A',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: 2,
+      name: 'Produto Teste 2', 
+      description: 'Descrição do produto 2',
+      price: 149.99,
+      category: 'Categoria B',
+      createdAt: new Date().toISOString()
+    }
+  ];
+  
+  res.json(products);
+});
+
 // Configuração da porta - Railway injeta automaticamente
 const PORT = process.env.PORT || 3000; // Seguindo o padrão do Railway
 const HOST = '0.0.0.0'; // Sempre bind em 0.0.0.0
