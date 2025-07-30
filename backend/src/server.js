@@ -95,6 +95,33 @@ app.get('/products', (req, res) => {
   res.json(products);
 });
 
+// Rota para criar novo produto
+app.post('/products', (req, res) => {
+  console.log('📦 Create product request:', req.body);
+  const { name, description, price, category, stock } = req.body;
+  
+  // Validação básica
+  if (!name || !description || !price || !category) {
+    return res.status(400).json({ 
+      message: 'Campos obrigatórios: name, description, price, category' 
+    });
+  }
+  
+  // Simular criação do produto
+  const newProduct = {
+    id: Date.now(), // ID temporário baseado no timestamp
+    name,
+    description,
+    price: Number(price),
+    category,
+    stock: Number(stock) || 0,
+    createdAt: new Date().toISOString()
+  };
+  
+  console.log('✅ Product created:', newProduct);
+  res.status(201).json(newProduct);
+});
+
 // Configuração da porta - Railway injeta automaticamente
 const PORT = process.env.PORT || 3000; // Seguindo o padrão do Railway
 const HOST = '0.0.0.0'; // Sempre bind em 0.0.0.0
