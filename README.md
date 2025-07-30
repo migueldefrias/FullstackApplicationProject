@@ -12,9 +12,6 @@ Sistema de gerenciamento de produtos com autenticação.
 - **Frontend**: [Ver aplicação rodando](https://fullstack-application-project.vercel.app)
 - **Backend API**: Disponível via Railway
 
-## Acesso à Aplicação
-Credenciais de teste serão fornecidas separadamente para avaliação.
-
 ## Funcionalidades
 - Autenticação de usuário
 - CRUD completo de produtos
