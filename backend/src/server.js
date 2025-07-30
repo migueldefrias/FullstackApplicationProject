@@ -4,7 +4,19 @@ const cors = require('cors');
 
 const app = express();
 
-app.use(cors());
+// CORS configurado para permitir frontend
+const corsOptions = {
+  origin: [
+    'http://localhost:3000', // Desenvolvimento local
+    'https://teste-tecnico-miguel-de-frias-b4-you.vercel.app', // Vercel (ajuste com sua URL)
+    /\.vercel\.app$/ // Qualquer subdomínio do Vercel
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const authRoutes = require('./routes/auth');
