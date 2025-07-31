@@ -1,4 +1,4 @@
-# B4YOU - Fullstack Application
+# Fullstack Application
 
 Sistema de gerenciamento de produtos com autenticação.
 
